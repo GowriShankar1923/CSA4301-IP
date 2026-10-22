@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Greenfield College Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Literata:wght@500;700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f5f4;--surf:#fff;--ink:#14231f;--mute:#5b6b66;--line:#d5dfdc;--acc:#0f6b57;--acc-ink:#fff;--warn:#b42318;--soft:#e1efeb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1715;--surf:#18231f;--ink:#e7f0ed;--mute:#97aaa4;--line:#2b3b36;--acc:#4cc2a4;--acc-ink:#07201a;--warn:#ff8a7a;--soft:#1f3029}}
+:root[data-theme="dark"]{--bg:#0f1715;--surf:#18231f;--ink:#e7f0ed;--mute:#97aaa4;--line:#2b3b36;--acc:#4cc2a4;--acc-ink:#07201a;--warn:#ff8a7a;--soft:#1f3029}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Public Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:Literata,Georgia,serif;margin:0 0 .4em;line-height:1.2}
+h1{font-size:clamp(28px,5vw,44px)}h2{font-size:24px}h3{font-size:18px}
+header{background:var(--surf);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.bar{max-width:1080px;margin:auto;padding:12px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.brand{font:700 20px Literata,serif;margin-right:auto;cursor:pointer}
+button,.btn{font:inherit;background:var(--acc);color:var(--acc-ink);border:0;border-radius:6px;padding:8px 14px;cursor:pointer;font-weight:500}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+button.sm{padding:4px 10px;font-size:13px}button.del{background:var(--warn);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+main{max-width:1080px;margin:auto;padding:24px 16px 64px}
+.hero{padding:28px 0 8px}.hero p{color:var(--mute);max-width:58ch}
+input,select,textarea{font:inherit;width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surf);color:var(--ink)}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
+.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:140px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:16px}
+.book{background:var(--surf);border:1px solid var(--line);border-left:6px solid var(--acc);border-radius:6px;padding:14px;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.book:hover{border-color:var(--acc)}.book small{color:var(--mute)}
+.tag{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--soft);color:var(--ink)}
+.tag.no{background:transparent;border:1px solid var(--warn);color:var(--warn)}
+.panel{background:var(--surf);border:1px solid var(--line);border-radius:8px;padding:18px;margin-top:14px}
+.narrow{max-width:420px;margin:24px auto}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}
+.tabs button{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.tabs button.on{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:560px}
+th,td{text-align:left;padding:8px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:13px;color:var(--mute);font-weight:600}
+.late{color:var(--warn);font-weight:600}
+.stats{display:flex;gap:12px;flex-wrap:wrap}.stat{flex:1;min-width:130px;background:var(--surf);border:1px solid var(--line);border-radius:8px;padding:12px}
+.stat b{display:block;font:700 26px Literata,serif}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}
+.modal>div{background:var(--surf);border-radius:10px;padding:22px;max-width:520px;width:100%;max-height:85vh;overflow:auto}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:6px;z-index:30;display:none}
+.muted{color:var(--mute)}
+.i{width:1.05em;height:1.05em;vertical-align:-.17em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-right:6px;flex:none}
+.brand .i{color:var(--acc);width:22px;height:22px}.stat .i{color:var(--acc);width:20px;height:20px;margin:0 0 4px;display:block}
+button .i{margin-right:5px}
+</style></head><body>
+<header><div class="bar" id="nav"></div></header>
+<main id="app"></main><div id="toast" role="status"></div><div id="mod"></div>
+<script>
+const K="gf_library_v1",RATE=5,LOAN=14;
+const d0=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const addD=(s,n)=>{const d=new Date(s+"T00:00:00");d.setDate(d.getDate()+n);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const diff=(a,b)=>Math.round((new Date(b+"T00:00:00")-new Date(a+"T00:00:00"))/864e5);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const $=id=>document.getElementById(id), v=id=>$(id).value.trim();
+function seed(){const t=d0();return{nid:100,
+users:[{id:1,name:"Mrs. Anita Rao",email:"admin@greenfield.edu",pw:"admin123",role:"admin"},
+{id:2,name:"Priya Sharma",email:"priya@greenfield.edu",pw:"student123",role:"student",roll:"CS21045",dept:"Computer Science",year:2,sem:3},
+{id:3,name:"Arjun Mehta",email:"arjun@greenfield.edu",pw:"student123",role:"student",roll:"ME21017",dept:"Mechanical",year:3,sem:5}],
+books:[[1,"Introduction to Algorithms","T. H. Cormen","9780262046305","Computer Science",3,"The standard reference on algorithms, covering sorting, graphs, dynamic programming and more."],
+[2,"Operating System Concepts","A. Silberschatz","9781119800361","Computer Science",2,"Processes, memory, storage and security in modern operating systems."],
+[3,"Database System Concepts","A. Silberschatz","9780078022159","Computer Science",2,"Relational model, SQL, transactions and database design."],
+[4,"Engineering Thermodynamics","P. K. Nag","9789339221324","Mechanical",2,"Laws of thermodynamics with worked engineering examples."],
+[5,"Fundamentals of Fluid Mechanics","B. Munson","9781119080701","Mechanical",1,"Fluid statics, flow analysis and dimensional analysis."],
+[6,"Higher Engineering Mathematics","B. S. Grewal","9788174091352","Mathematics",4,"Calculus, linear algebra, differential equations and numerical methods."],
+[7,"Discrete Mathematics","K. H. Rosen","9780073383095","Mathematics",2,"Logic, sets, combinatorics, graphs and proof techniques."],
+[8,"The God of Small Things","Arundhati Roy","9780812979657","Literature",1,"A novel set in Kerala about a family and the choices that shape it."]].map(a=>({id:a[0],title:a[1],author:a[2],isbn:a[3],cat:a[4],total:a[5],desc:a[6]})),
+loans:[{id:1,bookId:2,userId:2,issue:addD(t,-25),due:addD(t,-11),ret:null,extra:0},
+{id:2,bookId:1,userId:2,issue:addD(t,-40),due:addD(t,-26),ret:addD(t,-28),extra:0},
+{id:3,bookId:4,userId:3,issue:addD(t,-5),due:addD(t,9),ret:null,extra:0}],
+mats:[{id:1,title:"Data Structures: Unit 1 Notes",year:2,sem:3,body:"Arrays, linked lists, stacks and queues. Complexity analysis basics."},
+{id:2,title:"DBMS Previous Year Questions",year:2,sem:3,body:"Normalization, SQL queries and transaction questions from the last five years."},
+{id:3,title:"Thermodynamics Formula Sheet",year:3,sem:5,body:"First and second law relations, entropy and cycle efficiencies."},
+{id:4,title:"Engineering Maths II Syllabus",year:1,sem:2,body:"Syllabus and reading list for semester 2."}],
+msgs:[]}}
+let db;try{const s=localStorage.getItem(K);db=s?JSON.parse(s):seed()}catch(e){db=seed()}
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(db))}catch(e){}};
+let me=null,view="home",tab="",q="",cat="",mq={y:"",s:"",t:""},edit=null;
+const book=id=>db.books.find(b=>b.id==id),user=id=>db.users.find(u=>u.id==id);
+const avail=b=>b.total-db.loans.filter(l=>l.bookId==b.id&&!l.ret).length;
+const fine=l=>{const end=l.ret||d0();return Math.max(0,diff(l.due,end))*RATE+(l.extra||0)};
+const IC={book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',users:'<circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M17 4a4 4 0 0 1 0 8M22 21a7 7 0 0 0-4-6"/>',login:'<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/>',logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',plus:'<path d="M12 5v14M5 12h14"/>',edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',trash:'<path d="M3 6h18"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',check:'<path d="M20 6 9 17l-5-5"/>',dl:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',eye:'<path d="M2 12s4-8 10-8 10 8 10 8-4 8-10 8S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',layout:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',alert:'<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',send:'<path d="m22 2-7 20-4-9-9-4z"/><path d="M22 2 11 13"/>',msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',undo:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',coin:'<circle cx="12" cy="12" r="9"/><path d="M9 8h6M9 12h6M9 8c5 0 5 8 0 8h0"/>',hist:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/>',tick:'<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>'};
+const ic=n=>`<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[n]||""}</svg>`;
+let askCb=null,onlyAv=false;
+function ask(msg,cb,inp){askCb=cb;$("mod").innerHTML=`<div class="modal" onclick="if(event.target==this)closeM()"><div role="dialog"><p>${msg}</p>${inp?`<input id="askv" type="number" min="1" placeholder="Amount in ₹">`:""}<p><button onclick="askOk()">${ic("check")}Confirm</button> <button class="ghost" onclick="closeM()">Cancel</button></p></div></div>`}
+function askOk(){const x=$("askv"),val=x?x.value:null,cb=askCb;closeM();if(cb)cb(val)}
+function borrow(id){const b=book(id);if(!me||me.role!="student")return toast("Log in as a student to borrow.");if(avail(b)<1)return toast("No copies are available right now.");const act=db.loans.filter(l=>l.userId==me.id&&!l.ret);if(act.length>=3)return toast("You can borrow up to 3 books at a time.");if(act.some(l=>l.bookId==id))return toast("You already have this book.");db.loans.push({id:db.nid++,bookId:id,userId:me.id,issue:d0(),due:addD(d0(),LOAN),ret:null,extra:0});save();closeM();toast("Borrowed. Due "+addD(d0(),LOAN));render()}
+const toast=m=>{const t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.display="none",2600)};
+function go(x,t){view=x;if(t!==undefined)tab=t;edit=null;render();scrollTo(0,0)}
+function nav(){let h=`<div class="brand" onclick="go('home')">${ic("book")}Greenfield College Library</div><button class="ghost sm" onclick="go('home')">${ic("search")}Catalog</button><button class="ghost sm" onclick="go('contact')">${ic("mail")}Contact</button>`;
+if(me)h+=`<button class="ghost sm" onclick="go('dash',me.role=='admin'?'books':'history')">${ic(me.role=="admin"?"layout":"user")}${me.role=="admin"?"Admin dashboard":"My account"}</button><button class="sm" onclick="logout()">${ic("logout")}Log out (${esc(me.name.split(" ")[0])})</button>`;
+else h+=`<button class="ghost sm" onclick="go('login')">${ic("login")}Log in</button><button class="sm" onclick="go('register')">${ic("plus")}Register</button>`;
+$("nav").innerHTML=h}
+function render(){nav();$("app").innerHTML=({home,login:loginV,register:regV,contact,dash})[view]()}
+function bookCards(){const s=q.toLowerCase(),L=db.books.filter(b=>(!cat||b.cat==cat)&&(!onlyAv||avail(b)>0)&&(!s||[b.title,b.author,b.isbn,b.cat].join(" ").toLowerCase().includes(s)));
+return L.length?L.map(b=>{const a=avail(b);return`<div class="book" tabindex="0" onclick="openBook(${b.id})" onkeydown="if(event.key=='Enter')openBook(${b.id})"><h3>${esc(b.title)}</h3><small>${esc(b.author)}</small><span class="muted">${esc(b.cat)}</span><span class="tag ${a?"":"no"}">${a?a+" of "+b.total+" available":"All copies issued"}</span></div>`}).join(""):`<p class="muted">No books match “${esc(q)}”. Try a title, author, ISBN or subject.</p>`}
+function home(){const cats=[...new Set(db.books.map(b=>b.cat))];
+return`<div class="hero"><h1>Find a book, check it out, keep track.</h1><p>Search the college collection by title, author, ISBN or subject. Log in to see your borrowed books, due dates and fines.</p></div>
+<div class="row"><input id="q" placeholder="Search books" value="${esc(q)}" oninput="q=this.value;$('grid').innerHTML=bookCards()" aria-label="Search books"><select aria-label="Subject" onchange="cat=this.value;$('grid').innerHTML=bookCards()"><option value="">All subjects</option>${cats.map(c=>`<option ${c==cat?"selected":""}>${esc(c)}</option>`).join("")}</select></div>
+<p><label style="display:inline-flex;gap:8px;align-items:center;margin:0;color:var(--ink)"><input type="checkbox" style="width:auto" ${onlyAv?"checked":""} onchange="onlyAv=this.checked;$('grid').innerHTML=bookCards()">Show only available books</label></p><div class="grid" id="grid">${bookCards()}</div>`}
+function openBook(id){const b=book(id),a=avail(b);const due=db.loans.filter(l=>l.bookId==id&&!l.ret).map(l=>l.due).sort()[0];
+$("mod").innerHTML=`<div class="modal" onclick="if(event.target==this)closeM()"><div role="dialog" aria-label="Book details"><h2>${esc(b.title)}</h2><p>${esc(b.author)}</p><p>${esc(b.desc)}</p><table style="min-width:0"><tr><th>ISBN</th><td>${esc(b.isbn)}</td></tr><tr><th>Subject</th><td>${esc(b.cat)}</td></tr><tr><th>Copies</th><td>${a} of ${b.total} available</td></tr>${!a&&due?`<tr><th>Next return</th><td>${due}</td></tr>`:""}</table>${a?(me&&me.role=="student"?`<button onclick="borrow(${b.id})">${ic("book")}Borrow this book</button> `:me?`<p class="muted">Librarians issue books from Issue &amp; return in the dashboard.</p>`:`<p class="muted">Log in as a student to borrow this book.</p>`):`<p class="muted">All copies are out. Check back after the next return date.</p>`}<button class="ghost" onclick="closeM()">Close</button></div></div>`}
+const closeM=()=>$("mod").innerHTML="";
+function loginV(){return`<div class="panel narrow"><h2>Log in</h2><label for="e">Email</label><input id="e" type="email" autocomplete="username"><label for="p">Password</label><input id="p" type="password" autocomplete="current-password" onkeydown="if(event.key=='Enter')login()"><p><button onclick="login()">${ic("login")}Log in</button></p><p class="muted">Demo accounts: admin@greenfield.edu / admin123 (librarian), priya@greenfield.edu / student123 (student).</p><p class="muted">New student? <a href="#" onclick="go('register');return false">Register here</a>.</p></div>`}
+function login(){const u=db.users.find(u=>u.email==v("e").toLowerCase()&&u.pw==$("p").value);if(!u)return toast("Email or password is incorrect.");me=u;toast("Welcome, "+u.name.split(" ")[0]);go("dash",u.role=="admin"?"books":"history")}
+function logout(){me=null;go("home");toast("Logged out")}
+function regV(){return`<div class="panel narrow"><h2>Create student account</h2><label for="n">Full name</label><input id="n"><label for="e">Email</label><input id="e" type="email"><label for="r">Roll number</label><input id="r"><div class="row"><div><label for="y">Year</label><select id="y">${[1,2,3,4].map(i=>`<option>${i}</option>`).join("")}</select></div><div><label for="s">Semester</label><select id="s">${[1,2,3,4,5,6,7,8].map(i=>`<option>${i}</option>`).join("")}</select></div></div><label for="dp">Department</label><input id="dp"><label for="p">Password (6+ characters)</label><input id="p" type="password"><p><button onclick="register()">${ic("plus")}Create account</button></p></div>`}
+function register(){const e=v("e").toLowerCase();if(!v("n")||!e||!v("r"))return toast("Enter name, email and roll number.");if($("p").value.length<6)return toast("Password needs at least 6 characters.");if(db.users.some(u=>u.email==e))return toast("That email is already registered.");
+const u={id:db.nid++,name:v("n"),email:e,pw:$("p").value,role:"student",roll:v("r"),dept:v("dp"),year:+$("y").value,sem:+$("s").value};db.users.push(u);save();me=u;toast("Account created");go("dash","history")}
+function contact(){return`<div class="panel narrow"><h2>Contact the library</h2><p class="muted">Open Mon–Sat, 9 am to 6 pm. Ask about a book, a fine or study material.</p><label for="cn">Name</label><input id="cn" value="${esc(me?me.name:"")}"><label for="ce">Email</label><input id="ce" type="email" value="${esc(me?me.email:"")}"><label for="cm">Message</label><textarea id="cm" rows="4"></textarea><p><button onclick="sendMsg()">${ic("send")}Send message</button></p></div>`}
+function sendMsg(){if(!v("cn")||!v("ce")||!v("cm"))return toast("Fill in all three fields.");db.msgs.push({id:db.nid++,name:v("cn"),email:v("ce"),text:v("cm"),date:d0()});save();toast("Message sent. We’ll reply by email.");go("home")}
+function dash(){if(!me)return loginV();return me.role=="admin"?adminV():studentV()}
+const tabs=(L)=>`<div class="tabs">${L.map(([k,n,i])=>`<button class="${tab==k?"on":""}" onclick="go('dash','${k}')">${ic(i)}${n}</button>`).join("")}</div>`;
+/* ---------- student ---------- */
+function studentV(){const mine=db.loans.filter(l=>l.userId==me.id),tot=mine.reduce((s,l)=>s+fine(l),0),act=mine.filter(l=>!l.ret).length;
+let h=`<h2>Hello, ${esc(me.name)}</h2><div class="stats"><div class="stat">${ic("book")}<b>${act}</b>Books borrowed now</div><div class="stat">${ic("coin")}<b>₹${tot}</b>Fine due</div><div class="stat">${ic("hist")}<b>${mine.length}</b>Books borrowed in total</div></div>`+tabs([["history","Borrow history","hist"],["mat","Study material","file"],["prof","My profile","user"]]);
+if(tab=="history")h+=`<div class="panel tw"><table><tr><th>Book</th><th>Issue date</th><th>Due date</th><th>Status</th><th>Fine</th></tr>${mine.length?mine.slice().reverse().map(l=>{const f=fine(l),late=!l.ret&&l.due<d0();return`<tr><td>${esc(book(l.bookId).title)}</td><td>${l.issue}</td><td>${l.due}</td><td>${l.ret?"Returned "+l.ret:late?`<span class="late">Overdue by ${diff(l.due,d0())} days</span>`:"Borrowed"}</td><td>${f?`<span class="late">₹${f}</span>`:"–"}</td></tr>`}).join(""):`<tr><td colspan="5" class="muted">You haven’t borrowed anything yet. Browse the catalog and ask the librarian to issue a book.</td></tr>`}</table><p class="muted">Loans last ${LOAN} days. Late returns cost ₹${RATE} per day.</p></div>`;
+if(tab=="mat")h+=matFilter()+`<div class="panel tw" id="mats">${matTable(false)}</div>`;
+if(tab=="prof")h+=`<div class="panel"><h3>My profile</h3><div class="row"><div><label>Name</label><input id="pn" value="${esc(me.name)}"></div><div><label>Email</label><input id="pe" value="${esc(me.email)}"></div></div><div class="row"><div><label>Roll number</label><input id="pr" value="${esc(me.roll)}"></div><div><label>Department</label><input id="pd" value="${esc(me.dept)}"></div></div><div class="row"><div><label>Year</label><input id="py" type="number" min="1" max="4" value="${me.year}"></div><div><label>Semester</label><input id="ps" type="number" min="1" max="8" value="${me.sem}"></div></div><p><button onclick="saveProf()">${ic("save")}Save profile</button></p></div>`;
+return h}
+function saveProf(){if(!v("pn")||!v("pe"))return toast("Name and email are required.");Object.assign(me,{name:v("pn"),email:v("pe").toLowerCase(),roll:v("pr"),dept:v("pd"),year:+v("py"),sem:+v("ps")});save();nav();toast("Profile saved")}
+/* ---------- materials ---------- */
+function matFilter(){return`<div class="panel"><div class="row"><div><label>Search</label><input id="mt" value="${esc(mq.t)}" oninput="mq.t=this.value;$('mats').innerHTML=matTable(${me.role=="admin"})"></div><div><label>Year</label><select id="my" onchange="mq.y=this.value;$('mats').innerHTML=matTable(${me.role=="admin"})"><option value="">All</option>${[1,2,3,4].map(i=>`<option ${mq.y==i?"selected":""}>${i}</option>`).join("")}</select></div><div><label>Semester</label><select id="ms" onchange="mq.s=this.value;$('mats').innerHTML=matTable(${me.role=="admin"})"><option value="">All</option>${[1,2,3,4,5,6,7,8].map(i=>`<option ${mq.s==i?"selected":""}>${i}</option>`).join("")}</select></div></div></div>`}
+function matTable(adm){const L=db.mats.filter(m=>(!mq.y||m.year==mq.y)&&(!mq.s||m.sem==mq.s)&&(!mq.t||m.title.toLowerCase().includes(mq.t.toLowerCase())));
+return`<table><tr><th>Title</th><th>Year</th><th>Sem</th><th></th></tr>${L.length?L.map(m=>`<tr><td>${esc(m.title)}</td><td>${m.year}</td><td>${m.sem}</td><td><button class="sm ghost" onclick="viewMat(${m.id})">${ic("eye")}View</button> <button class="sm" onclick="dlMat(${m.id})">${ic("dl")}Download</button>${adm?` <button class="sm ghost" onclick="editMat(${m.id})">${ic("edit")}Edit</button> <button class="sm del" onclick="delMat(${m.id})">${ic("trash")}Delete</button>`:""}</td></tr>`).join(""):`<tr><td colspan="4" class="muted">No material for this year and semester yet.</td></tr>`}</table>`}
+function viewMat(id){const m=db.mats.find(x=>x.id==id);$("mod").innerHTML=`<div class="modal" onclick="if(event.target==this)closeM()"><div><h2>${esc(m.title)}</h2><p class="muted">Year ${m.year}, semester ${m.sem}</p><p>${esc(m.body)}</p><button onclick="closeM()">Close</button></div></div>`}
+async function dlMat(id){const m=db.mats.find(x=>x.id==id);try{const dl=await claude.use("downloads");if(dl){await dl.save({filename:m.title.replace(/\W+/g,"_")+".txt",data:m.title+"\nYear "+m.year+", Semester "+m.sem+"\n\n"+m.body});return toast("Download ready")}}catch(e){if(e&&e.code=="declined")return}try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([m.title+"\nYear "+m.year+", Semester "+m.sem+"\n\n"+m.body],{type:"text/plain"}));a.download=m.title.replace(/\W+/g,"_")+".txt";a.click();toast("Download started")}catch(e){toast("Download isn’t available here. Use View instead.")}}
+/* ---------- admin ---------- */
+function adminV(){const act=db.loans.filter(l=>!l.ret),od=act.filter(l=>l.due<d0()).length;
+let h=`<h2>Admin dashboard</h2><div class="stats"><div class="stat">${ic("book")}<b>${db.books.reduce((s,b)=>s+b.total,0)}</b>Total copies</div><div class="stat">${ic("tick")}<b>${db.books.reduce((s,b)=>s+avail(b),0)}</b>Available now</div><div class="stat">${ic("clock")}<b>${act.length}</b>Issued now</div><div class="stat">${ic("alert")}<b>${od}</b>Overdue</div><div class="stat">${ic("users")}<b>${db.users.filter(u=>u.role=="student").length}</b>Students</div></div>`+tabs([["books","Books","book"],["issue","Issue & return","undo"],["mat","Study material","file"],["users","Students","users"],["msgs","Messages","msg"]]);
+if(tab=="books"){const b=edit&&edit.t=="b"?book(edit.id):{};
+h+=`<div class="panel"><h3>${b.id?"Update book":"Add a book"}</h3><div class="row"><div><label>Title</label><input id="bt" value="${esc(b.title)}"></div><div><label>Author</label><input id="ba" value="${esc(b.author)}"></div></div><div class="row"><div><label>ISBN</label><input id="bi" value="${esc(b.isbn)}"></div><div><label>Subject</label><input id="bc" value="${esc(b.cat)}"></div><div><label>Copies</label><input id="bn" type="number" min="1" value="${b.total||1}"></div></div><label>Description</label><textarea id="bd" rows="2">${esc(b.desc)}</textarea><p><button onclick="saveBook(${b.id||0})">${ic(b.id?"save":"plus")}${b.id?"Save changes":"Add book"}</button> ${b.id?`<button class="ghost" onclick="go('dash','books')">Cancel</button>`:""}</p></div>
+<div class="panel tw"><table><tr><th>Title</th><th>Author</th><th>Subject</th><th>Available</th><th></th></tr>${db.books.map(x=>`<tr><td>${esc(x.title)}</td><td>${esc(x.author)}</td><td>${esc(x.cat)}</td><td><span class="tag ${avail(x)?"":"no"}">${avail(x)?"Available "+avail(x)+" / "+x.total:"All issued"}</span></td><td><button class="sm ghost" onclick="edit={t:'b',id:${x.id}};render();scrollTo(0,0)">${ic("edit")}Edit</button> <button class="sm del" onclick="delBook(${x.id})">${ic("trash")}Delete</button></td></tr>`).join("")}</table></div>`}
+if(tab=="issue"){const st=db.users.filter(u=>u.role=="student");
+h+=`<div class="panel"><h3>Issue a book</h3><div class="row"><div><label>Student</label><select id="is">${st.map(u=>`<option value="${u.id}">${esc(u.name)} (${esc(u.roll)})</option>`).join("")}</select></div><div><label>Book</label><select id="ib">${db.books.filter(b=>avail(b)>0).map(b=>`<option value="${b.id}">${esc(b.title)}</option>`).join("")}</select></div><div><label>Days</label><input id="id" type="number" min="1" value="${LOAN}"></div></div><p><button onclick="issue()">${ic("clock")}Issue book</button></p></div>
+<div class="panel tw"><h3>Loans</h3><table><tr><th>Student</th><th>Book</th><th>Issued</th><th>Due</th><th>Status</th><th>Fine</th><th></th></tr>${db.loans.slice().reverse().map(l=>{const f=fine(l);return`<tr><td>${esc(user(l.userId).name)}</td><td>${esc(book(l.bookId).title)}</td><td>${l.issue}</td><td>${l.due}</td><td>${l.ret?"Returned "+l.ret:l.due<d0()?`<span class="late">Overdue</span>`:"Issued"}</td><td>${f?`<span class="late">₹${f}</span>`:"–"}</td><td>${l.ret?"":`<button class="sm" onclick="ret(${l.id})">${ic("undo")}Return</button> `}<button class="sm ghost" onclick="addFine(${l.id})">${ic("coin")}Add fine</button></td></tr>`}).join("")}</table></div>`}
+if(tab=="mat"){const m=edit&&edit.t=="m"?db.mats.find(x=>x.id==edit.id):{};
+h+=`<div class="panel"><h3>${m.id?"Update material":"Add material"}</h3><div class="row"><div style="flex:2"><label>Title</label><input id="xt" value="${esc(m.title)}"></div><div><label>Year</label><select id="xy">${[1,2,3,4].map(i=>`<option ${m.year==i?"selected":""}>${i}</option>`).join("")}</select></div><div><label>Semester</label><select id="xs">${[1,2,3,4,5,6,7,8].map(i=>`<option ${m.sem==i?"selected":""}>${i}</option>`).join("")}</select></div></div><label>Content</label><textarea id="xb" rows="3">${esc(m.body)}</textarea><p><button onclick="saveMat(${m.id||0})">${ic(m.id?"save":"plus")}${m.id?"Save changes":"Add material"}</button></p></div>`+matFilter()+`<div class="panel tw" id="mats">${matTable(true)}</div>`}
+if(tab=="users")h+=`<div class="panel tw"><table><tr><th>Name</th><th>Roll</th><th>Department</th><th>Year / Sem</th><th>Borrowed</th><th>Fine due</th></tr>${db.users.filter(u=>u.role=="student").map(u=>{const L=db.loans.filter(l=>l.userId==u.id);const f=L.reduce((s,l)=>s+fine(l),0);return`<tr><td>${esc(u.name)}<br><small class="muted">${esc(u.email)}</small></td><td>${esc(u.roll)}</td><td>${esc(u.dept)}</td><td>${u.year} / ${u.sem}</td><td>${L.filter(l=>!l.ret).length}</td><td>${f?`<span class="late">₹${f}</span>`:"–"}</td></tr>`}).join("")}</table></div>`;
+if(tab=="msgs")h+=`<div class="panel">${db.msgs.length?db.msgs.slice().reverse().map(m=>`<p><b>${esc(m.name)}</b> <span class="muted">${esc(m.email)}, ${m.date}</span><br>${esc(m.text)}</p>`).join("<hr>"):`<p class="muted">No messages yet. Contact form submissions show up here.</p>`}</div>`;
+return h}
+function saveBook(id){if(!v("bt")||!v("ba"))return toast("Title and author are required.");const o={title:v("bt"),author:v("ba"),isbn:v("bi"),cat:v("bc")||"General",total:Math.max(1,+v("bn")||1),desc:v("bd")};
+if(id)Object.assign(book(id),o);else db.books.push({id:db.nid++,...o});save();toast(id?"Book updated":"Book added");go("dash","books")}
+function delBook(id){if(db.loans.some(l=>l.bookId==id&&!l.ret))return toast("This book is issued. Return it before deleting.");ask("Delete this book from the catalog?",()=>{db.books=db.books.filter(b=>b.id!=id);save();toast("Book deleted");render()})}
+function issue(){const b=+v("ib"),u=+v("is");if(!b||!u)return toast("Choose a student and a book.");const n=+v("id")||LOAN;db.loans.push({id:db.nid++,bookId:b,userId:u,issue:d0(),due:addD(d0(),n),ret:null,extra:0});save();toast("Book issued. Due "+addD(d0(),n));render()}
+function ret(id){const l=db.loans.find(x=>x.id==id);l.ret=d0();save();const f=fine(l);toast(f?"Returned. Fine due: ₹"+f:"Returned on time");render()}
+function addFine(id){ask("Fine amount in ₹ (for damage or loss):",a=>{const n=Math.round(+a);if(!(n>0))return toast("Enter an amount above 0.");db.loans.find(x=>x.id==id).extra+=n;save();toast("Fine of ₹"+n+" added");render()},true)}
+function saveMat(id){if(!v("xt"))return toast("Enter a title.");const o={title:v("xt"),year:+v("xy"),sem:+v("xs"),body:v("xb")};if(id)Object.assign(db.mats.find(m=>m.id==id),o);else db.mats.push({id:db.nid++,...o});save();toast(id?"Material updated":"Material added");go("dash","mat")}
+function editMat(id){edit={t:"m",id};render();scrollTo(0,0)}
+function delMat(id){ask("Delete this material?",()=>{db.mats=db.mats.filter(m=>m.id!=id);save();toast("Material deleted");render()})}
+render();
+</script></body></html>
